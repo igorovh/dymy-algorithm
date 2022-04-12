@@ -1,0 +1,19 @@
+{
+  "name": "project-dymy",
+  "version": "1.0.0",
+  "description": "chat algorithm is in js/algorithm.js  \r feel free to pr :>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/animekkk/project-dymy.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/animekkk/project-dymy/issues"
+  },
+  "homepage": "https://github.com/animekkk/project-dymy#readme"
+}

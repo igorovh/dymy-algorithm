@@ -1,4 +1,3 @@
-chat algorithm is in js/algorithm.js  
-feel free to pr :>  
-  
-every other file is just for testing this algorithm
+algorithm will be used to find best moments in stream
+
+feel free to pr :>
