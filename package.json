@@ -4,7 +4,7 @@
   "description": "chat algorithm is in js/algorithm.js  \r feel free to pr :>",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-specifier-resolution=node test/test.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/animekkk/project-dymy/issues"
   },
-  "homepage": "https://github.com/animekkk/project-dymy#readme"
+  "homepage": "https://github.com/animekkk/project-dymy#readme",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.2.3"
+  }
 }
