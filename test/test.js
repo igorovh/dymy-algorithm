@@ -1,14 +1,14 @@
-import { dymy } from '..';
+import dymy from '..';
+import { secondsToTimestamp } from '../utils/time';
 
-const chunks = await dymy(1299995728);
+const { video, chunks } = await dymy(1631596204);
 
-console.log(chunks);
 
-chunks.sort((a, b) => {
-    return b - a;
-});
-
-console.info('Top 3 moments:');
-console.info(`1. ${chunks[0].startTime}s - ${chunks[0].endTime}s (${chunks[0].messagesAmount})`);
-console.info(`2. ${chunks[1].startTime}s - ${chunks[1].endTime}s (${chunks[1].messagesAmount})`);
-console.info(`3. ${chunks[2].startTime}s - ${chunks[2].endTime}s (${chunks[2].messagesAmount})`);
+console.info(`${video.user_name} - ${video.title}`);
+console.info('Top 10 moments:');
+for(let i = 0; i < 10; i++) {
+    const chunk = chunks[i];
+    if(chunk) {
+        console.info(`${i + 1}. ${secondsToTimestamp(chunk.startTime)} - ${secondsToTimestamp(chunk.endTime)} (${chunk.points} points)`);
+    }
+}

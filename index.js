@@ -1,12 +1,20 @@
 import fetch from 'node-fetch';
-import { convertTimeToSeconds } from './utils/time'
+import { convertTimeToSeconds } from './utils/time';
+import { checkPoints } from './utils/points';
 
-export async function dymy(videoId) {
+export default async function dymy(videoId) {
     const videoInfo = await downloadInfo(videoId);
     videoInfo.durationInSeconds = convertTimeToSeconds(videoInfo.duration);
-    const dymyChunks = generateChunks(videoInfo);
+    const chunks = await generateChunks(videoInfo);
 
-    return dymyChunks;
+    chunks.sort((a, b) => {
+        return b.points - a.points;
+    });
+
+    return {
+        video: videoInfo,
+        chunks
+    };
 }
 
 async function downloadInfo(videoId) {
@@ -16,39 +24,44 @@ async function downloadInfo(videoId) {
     return json.data[0];
 }
 
-async function generateChunks(videoInfo, time = 300) {
-    return await downloadMessages(videoInfo, time);
+async function generateChunks(videoInfo) {
+    return await downloadMessages(videoInfo);
 }
 
-async function downloadMessages(videoInfo, time, messagesAmount = 0, iteration = 1, chunks = [], startTime = 0, _page) {
+async function downloadMessages(videoInfo, chunks = [], iteration = 0, _page) {
+    console.info(`Downloading next page (${iteration}) (${_page})`);
+
     let data = await fetch(`https://api.twitch.tv/v5/videos/${videoInfo.id}/comments` + (_page ? `?cursor=${_page}` : ''), {
         headers: {
             'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko'
         }
     });
-    
+
     data = await data.json();
-    messagesAmount += data.comments.length;
-    
-    if(data.comments.length > 0) {
+
+    const messagesAmount = data.comments.length;
+    if(messagesAmount > 0) {
+        const firstMessageTime = data.comments.at(0).content_offset_seconds;
         const lastMessageTime = data.comments.at(-1).content_offset_seconds;
-        if(iteration * time > lastMessageTime) {
-            iteration++;
-            chunks.push({
-                id: iteration - 1,
-                messagesAmount: messagesAmount,
-                startTime: startTime,
-                endTime: lastMessageTime 
-            });
-            messagesAmount = 0;
-            startTime = lastMessageTime;
+    
+        let points = 0;
+        for(const message of data.comments) {
+            const body = message.message?.body;
+            if(checkPoints(body)) points++;
         }
+
+        chunks.push({
+            id: iteration++,
+            messagesAmount,
+            points,
+            startTime: firstMessageTime,
+            endTime: lastMessageTime,
+        });
     }
     
     if(data._next) {
-        return await downloadMessages(videoInfo, time, messagesAmount, iteration, chunks, startTime, data._next);
+        return await downloadMessages(videoInfo, chunks, iteration, data._next);
     } else {
-        //TODO SAVE LAST CHUNK
         return chunks;
     }
 }
